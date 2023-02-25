@@ -39,6 +39,12 @@ class MixologyApp extends StatelessWidget {
   }
 }
 
+extension on String {
+  String? nullIfEmpty() {
+    return isEmpty ? null : this;
+  }
+}
+
 RouterConfig<Object> _createRouter() {
   return GoRouter(
     routes: [
@@ -54,8 +60,8 @@ RouterConfig<Object> _createRouter() {
         path: '/auth/callback',
         builder: (context, state) => AuthCallbackPage(
           state: state.queryParams['state'],
-          error: state.queryParams['error'],
-          code: state.queryParams['code'],
+          error: state.queryParams['error']?.nullIfEmpty(),
+          code: state.queryParams['code']?.nullIfEmpty(),
         ),
       ),
     ],
