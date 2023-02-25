@@ -103,7 +103,7 @@ class _HttpAuthApi implements AuthApi {
       queryParameters: {
         'state': state,
         if (code != null) 'code': code,
-        // if (error != null) 'error': error,
+        if (error != null) 'error': error,
       },
     );
 
