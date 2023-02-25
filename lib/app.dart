@@ -3,11 +3,10 @@ import 'dart:async';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:frontend/bloc/auth.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
-import 'package:go_router/go_router.dart';
-
+import 'package:frontend/bloc/auth.dart';
 import 'package:frontend/color_schemes.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MixologyApp extends StatelessWidget {
@@ -48,6 +47,10 @@ RouterConfig<Object> _createRouter() {
         builder: (context, state) => const HomePage(),
       ),
       GoRoute(
+        path: '/auth/login',
+        builder: (context, state) => const LoginPage(),
+      ),
+      GoRoute(
         path: '/auth/callback',
         builder: (context, state) => AuthCallbackPage(
           state: state.queryParams['state'],
@@ -55,12 +58,21 @@ RouterConfig<Object> _createRouter() {
           code: state.queryParams['code'],
         ),
       ),
-      GoRoute(
-        path: '/success',
-        builder: (context, state) => const SuccessPage(),
-      ),
     ],
   );
+}
+
+class LoginPage extends StatelessWidget {
+  const LoginPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: AuthGuide(),
+      ),
+    );
+  }
 }
 
 class AuthCallbackPage extends StatefulWidget {
@@ -91,30 +103,42 @@ class _AuthCallbackPageState extends State<AuthCallbackPage> {
         error: widget.error,
       ));
     }
-    // TODO: show error if state is null
-
-    context.go('/');
   }
 
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
       body: Center(
-        child: CircularProgressIndicator(),
+        child: AuthGuide(),
       ),
     );
   }
 }
 
-class SuccessPage extends StatelessWidget {
-  const SuccessPage({super.key});
+class Authenticated extends StatelessWidget {
+  final Widget Function(BuildContext) builder;
+
+  const Authenticated({super.key, required this.builder});
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('yay'),
-      ),
+    return BlocConsumer<AuthBloc, AuthState>(
+      builder: (context, state) {
+        if (state.stage == AuthStage.loggedIn) {
+          return builder(context);
+        } else {
+          return const CircularProgressIndicator();
+        }
+      },
+      listener: (context, state) {
+        switch (state.stage) {
+          case AuthStage.loggedIn:
+          case AuthStage.loading:
+            return;
+          default:
+            context.go('/auth/login');
+        }
+      },
     );
   }
 }
@@ -124,9 +148,11 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Center(
-        child: AuthGuide(),
+        child: Authenticated(
+          builder: (context) => const Text('Success! You are now logged in.'),
+        ),
       ),
     );
   }
@@ -148,16 +174,24 @@ class AuthGuide extends StatelessWidget {
       builder: (context, state) {
         switch (state.stage) {
           case AuthStage.loginRequired:
-            // TODO: show error
-            return LoginButton(
-              action: () =>
-                  BlocProvider.of<AuthBloc>(context).add(const LoginEvent()),
+            final error = state.error;
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (error != null) Text(error),
+                LoginButton(
+                  action: () => BlocProvider.of<AuthBloc>(context)
+                      .add(const LoginEvent()),
+                ),
+              ],
             );
           case AuthStage.userAuthorization:
             // This will likely never be shown because of the listener.
             return LoginButton(
               action: () => _launchUrl(state.authorizationUrl),
             );
+          case AuthStage.loggedIn:
+            return const Text('You are logged in, but I am incompetent');
           case AuthStage.loading:
           default:
             return const CircularProgressIndicator();
@@ -170,7 +204,7 @@ class AuthGuide extends StatelessWidget {
             _launchUrl(state.authorizationUrl);
             break;
           case AuthStage.loggedIn:
-            context.go('/success');
+            context.go('/');
             break;
           default:
             break;
