@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:frontend/api/util.dart';
-import 'package:meta/meta.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/retry.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:meta/meta.dart';
 
 part 'auth.g.dart';
 
@@ -102,8 +102,8 @@ class _HttpAuthApi implements AuthApi {
     final url = _baseUri.resolve('/auth/callback').replace(
       queryParameters: {
         'state': state,
-        'code': code,
-        'error': error,
+        if (code != null) 'code': code,
+        if (error != null) 'error': error,
       },
     );
 
