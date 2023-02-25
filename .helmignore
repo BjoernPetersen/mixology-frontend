@@ -1,0 +1,13 @@
+build/
+.dart_tool/
+.git/
+.github/
+.idea/
+.flutter*
+
+pubspec.*
+analysis_options.yaml
+
+web/
+lib/
+test/

@@ -1,0 +1,5 @@
+apiVersion: v2
+name: mixology-frontend
+description: "It's a frontend"
+type: application
+version: 1.0.0
