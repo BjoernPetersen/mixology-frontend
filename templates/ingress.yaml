@@ -5,7 +5,6 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-born
     cert-manager.io/issue-temporary-certificate: "false"
-    nginx.ingress.kubernetes.io/rewrite-target: /index.html
 spec:
   rules:
     - host: mix.bembel.party
