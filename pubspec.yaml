@@ -16,6 +16,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^8.1.2
+  flutter_web_plugins:
+    sdk: flutter
   go_router: ^6.2.0
   http: ^0.13.5
   json_annotation: ^4.8.0

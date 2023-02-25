@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/bloc/auth.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:frontend/color_schemes.dart';
@@ -14,6 +16,14 @@ class MixologyApp extends StatelessWidget {
 
   MixologyApp({super.key, required this.apiBaseUrl})
       : _router = _createRouter();
+
+  static void run(Uri apiBaseUrl) {
+    Bloc.transformer = sequential();
+    usePathUrlStrategy();
+    runApp(MixologyApp(
+      apiBaseUrl: apiBaseUrl,
+    ));
+  }
 
   @override
   Widget build(BuildContext context) {

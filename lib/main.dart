@@ -1,12 +1,5 @@
-import 'package:bloc/bloc.dart';
-import 'package:bloc_concurrency/bloc_concurrency.dart';
-import 'package:flutter/material.dart';
-
 import 'package:frontend/app.dart';
 
 void main() {
-  Bloc.transformer = sequential();
-  runApp(MixologyApp(
-    apiBaseUrl: Uri.https('api.mix.bembel.party'),
-  ));
+  MixologyApp.run(Uri.https('api.mix.bembel.party'));
 }
