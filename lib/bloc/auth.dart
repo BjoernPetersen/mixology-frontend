@@ -73,7 +73,8 @@ class AuthState {
     Uri? authorizationUrl,
     AuthManager? authManager,
     this.error,
-  }) : _authorizationUrl = authorizationUrl, _authManager=authManager;
+  })  : _authorizationUrl = authorizationUrl,
+        _authManager = authManager;
 
   factory AuthState.loading() {
     return const AuthState._(
@@ -96,7 +97,7 @@ class AuthState {
   }
 
   factory AuthState.loggedIn(AuthManager authManager) {
-    return  AuthState._(
+    return AuthState._(
       stage: AuthStage.loggedIn,
       authManager: authManager,
     );

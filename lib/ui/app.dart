@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:frontend/bloc/auth.dart';
-import 'package:frontend/bloc/mixology.dart';
 import 'package:frontend/color_schemes.dart';
+import 'package:frontend/ui/account.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -14,8 +14,10 @@ class MixologyApp extends StatelessWidget {
   final Uri apiBaseUrl;
   final RouterConfig<Object> _router;
 
-  MixologyApp({super.key, required this.apiBaseUrl})
-      : _router = _createRouter();
+  MixologyApp({
+    super.key,
+    required this.apiBaseUrl,
+  }) : _router = _createRouter();
 
   static void run(Uri apiBaseUrl) {
     Bloc.transformer = sequential();
@@ -51,7 +53,7 @@ RouterConfig<Object> _createRouter() {
     routes: [
       GoRoute(
         path: '/',
-        builder: (context, state) => const HomePage(),
+        builder: (context, state) => const AccountPage(),
       ),
       GoRoute(
         path: '/auth/login',
@@ -117,52 +119,6 @@ class _AuthCallbackPageState extends State<AuthCallbackPage> {
     return const Scaffold(
       body: Center(
         child: AuthGuide(),
-      ),
-    );
-  }
-}
-
-class Authenticated extends StatelessWidget {
-  final Widget Function(BuildContext) builder;
-
-  const Authenticated({super.key, required this.builder});
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocConsumer<AuthBloc, AuthState>(
-      builder: (context, state) {
-        if (state.stage == AuthStage.loggedIn) {
-          return BlocProvider(
-            create: (_) => MixologyBloc(state.authManager),
-            child: builder(context),
-          );
-        } else {
-          return const CircularProgressIndicator();
-        }
-      },
-      listener: (context, state) {
-        switch (state.stage) {
-          case AuthStage.loggedIn:
-          case AuthStage.loading:
-            return;
-          default:
-            context.go('/auth/login');
-        }
-      },
-    );
-  }
-}
-
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Authenticated(
-          builder: (context) => const Text('Success! You are now logged in.'),
-        ),
       ),
     );
   }
