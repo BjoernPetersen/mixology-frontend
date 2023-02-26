@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:frontend/api/main.dart';
 import 'package:frontend/auth_manager.dart';
+import 'package:frontend/loadable.dart';
 import 'package:meta/meta.dart';
 
 @immutable
@@ -20,22 +21,6 @@ class GetAccount implements _MixologyEvent {
 
 class DeleteAccount implements _MixologyEvent {
   const DeleteAccount();
-}
-
-@sealed
-abstract class Loadable<T> {
-  const Loadable._();
-}
-
-class Loaded<T> implements Loadable<T> {
-  final DateTime loadedAt;
-  final T value;
-
-  Loaded(this.value) : loadedAt = DateTime.now();
-}
-
-class Unloaded<T> implements Loadable<T> {
-  const Unloaded();
 }
 
 @immutable
@@ -103,14 +88,27 @@ class MixologyBloc extends Bloc<_MixologyEvent, MixologyState> {
       return;
     }
 
-    final accountInfo = await _api.getAccountInfo();
-    emit(state.copyWith(accountInfo: Loaded(accountInfo)));
+    emit(state.copyWith(accountInfo: Loading(state.accountInfo)));
+
+    try {
+      final accountInfo = await _api.getAccountInfo();
+      emit(state.copyWith(accountInfo: Loaded(accountInfo)));
+    } catch (e) {
+      emit(state.copyWith(
+        accountInfo: LoadingError(
+          'An error occurred during account refresh',
+          state.accountInfo,
+        ),
+      ));
+    }
   }
 
   Future<void> _deleteAccount(
     DeleteAccount event,
     Emitter<MixologyState> emit,
   ) async {
+    emit(state.copyWith(accountDeletion: Loading()));
+
     await _api.deleteAccount();
     await _authManager.logout();
 
