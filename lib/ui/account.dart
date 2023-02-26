@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/api/main.dart';
+import 'package:frontend/bloc/auth.dart';
 import 'package:frontend/bloc/mixology.dart';
 import 'package:frontend/ui/authenticated.dart';
+import 'package:frontend/ui/constants.dart';
 import 'package:frontend/ui/loading.dart';
 
 class AccountPage extends StatelessWidget {
@@ -13,10 +15,29 @@ class AccountPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Account'),
+        actions: const [
+          _LogoutButton(),
+        ],
       ),
       body: Authenticated(
         builder: (context) => const _AccountPageBody(),
       ),
+    );
+  }
+}
+
+class _LogoutButton extends StatelessWidget {
+  const _LogoutButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      tooltip: 'Log out',
+      icon: const Icon(Icons.logout, size: kAppBarActionSize),
+      onPressed: () {
+        final bloc = BlocProvider.of<AuthBloc>(context);
+        bloc.add(const LogoutEvent());
+      },
     );
   }
 }

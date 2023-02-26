@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/bloc/auth.dart';
 import 'package:frontend/bloc/mixology.dart';
 import 'package:frontend/ui/authenticated.dart';
+import 'package:frontend/ui/constants.dart';
 import 'package:frontend/ui/loading.dart';
 import 'package:go_router/go_router.dart';
 import 'package:spotify_api/spotify_api.dart';
@@ -35,7 +36,7 @@ class _AccountButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: () => context.push('/account'),
-      icon: const Icon(Icons.account_circle, size: 40),
+      icon: const Icon(Icons.account_circle, size: kAppBarActionSize),
       tooltip: 'My Account',
     );
   }

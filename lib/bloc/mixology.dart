@@ -155,8 +155,6 @@ class MixologyBloc extends Bloc<_MixologyEvent, MixologyState> {
       return;
     }
 
-    await _authManager.logout();
-
     emit(MixologyState.loggedOut());
   }
 

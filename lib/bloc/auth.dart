@@ -156,11 +156,15 @@ class AuthBloc extends Bloc<_AuthEvent, AuthState> {
     } else if (event is UserAuthorizedEvent) {
       return _userAuthorized(event, emit);
     } else if (event is LogoutEvent) {
-      emit(AuthState.loginRequired());
-      return Future.value();
+      return _logout(event, emit);
     } else {
       throw ArgumentError.value(event, 'event', 'unknown even type');
     }
+  }
+
+  Future<void> _logout(LogoutEvent event, Emitter<AuthState> emit) async {
+    emit(AuthState.loginRequired());
+    await _authManager.logout();
   }
 
   Future<void> _init(_InitEvent event, Emitter<AuthState> emit) async {
