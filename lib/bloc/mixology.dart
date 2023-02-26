@@ -18,6 +18,10 @@ class GetAccount implements _MixologyEvent {
   ]) : maxAge = DateTime.now().subtract(maxAge);
 }
 
+class DeleteAccount implements _MixologyEvent {
+  const DeleteAccount();
+}
+
 @sealed
 abstract class Loadable<T> {
   const Loadable._();
@@ -34,41 +38,53 @@ class Unloaded<T> implements Loadable<T> {
   const Unloaded();
 }
 
-extension _Loading<T> on T {
-  Loaded<T> get loaded => Loaded(this);
-}
-
 @immutable
 class MixologyState {
+  final bool loggedOut;
+  final Loadable<void> accountDeletion;
   final Loadable<AccountInfoResponse> accountInfo;
 
   const MixologyState._({
+    required this.loggedOut,
+    required this.accountDeletion,
     required this.accountInfo,
   });
 
   factory MixologyState.initial() {
     return const MixologyState._(
+      loggedOut: false,
+      accountDeletion: Unloaded(),
       accountInfo: Unloaded(),
     );
   }
 
-  MixologyState copyWith({AccountInfoResponse? accountInfo}) {
+  MixologyState copyWith({
+    Loadable<void>? accountDeletion,
+    Loadable<AccountInfoResponse>? accountInfo,
+  }) {
     return MixologyState._(
-      accountInfo: accountInfo?.loaded ?? this.accountInfo,
+      loggedOut: loggedOut,
+      accountDeletion: accountDeletion ?? this.accountDeletion,
+      accountInfo: accountInfo ?? this.accountInfo,
     );
   }
+
+  factory MixologyState.loggedOut() => const MixologyState._(
+        loggedOut: true,
+        accountDeletion: Unloaded(),
+        accountInfo: Unloaded(),
+      );
 }
 
 class MixologyBloc extends Bloc<_MixologyEvent, MixologyState> {
+  final AuthManager _authManager;
   final MixologyApi _api;
 
-  MixologyBloc(AuthManager authManager)
-      : _api = MixologyApi.http(
-          baseUri: authManager.apiBaseUri,
-          authManager: authManager,
-        ),
+  MixologyBloc(this._authManager)
+      : _api = MixologyApi.http(authManager: _authManager),
         super(MixologyState.initial()) {
     on<GetAccount>(_getAccount);
+    on<DeleteAccount>(_deleteAccount);
   }
 
   bool _isFresh<T>(Loadable<T> value, DateTime maxAge) {
@@ -88,6 +104,22 @@ class MixologyBloc extends Bloc<_MixologyEvent, MixologyState> {
     }
 
     final accountInfo = await _api.getAccountInfo();
-    emit(state.copyWith(accountInfo: accountInfo));
+    emit(state.copyWith(accountInfo: Loaded(accountInfo)));
+  }
+
+  Future<void> _deleteAccount(
+    DeleteAccount event,
+    Emitter<MixologyState> emit,
+  ) async {
+    await _api.deleteAccount();
+    await _authManager.logout();
+
+    emit(MixologyState.loggedOut());
+  }
+
+  @override
+  Future<void> close() async {
+    await _api.close();
+    await super.close();
   }
 }

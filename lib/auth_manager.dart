@@ -66,6 +66,14 @@ class AuthManager {
 
   Uri get apiBaseUri => _authApi.baseUri;
 
+  Future<void> logout() async {
+    await _mutex.protect(() async {
+      _accessToken = null;
+      _refreshToken = null;
+      await _preferences.clear();
+    });
+  }
+
   Future<bool> get hasRefreshToken async {
     return await _mutex.protect(() async {
       final refreshToken = _refreshToken;
@@ -75,7 +83,7 @@ class AuthManager {
 
   Future<void> updateToken({
     required String refreshToken,
-    required String accessToken,
+    required String? accessToken,
   }) async {
     await _mutex.protect(() async {
       _unsafeSaveTokens(
@@ -97,7 +105,7 @@ class AuthManager {
 
   Future<void> _unsafeSaveTokens({
     required String? refreshToken,
-    required String accessToken,
+    required String? accessToken,
   }) async {
     if (refreshToken != null) {
       final token = Token.fromValue(refreshToken);
@@ -105,9 +113,11 @@ class AuthManager {
       await _preferences.setString(_refreshTokenKey, refreshToken);
     }
 
-    final token = Token.fromValue(accessToken);
-    _refreshToken = token;
-    await _preferences.setString(_accessTokenKey, accessToken);
+    if (accessToken != null) {
+      final token = Token.fromValue(accessToken);
+      _accessToken = token;
+      await _preferences.setString(_accessTokenKey, accessToken);
+    }
   }
 
   Future<String> _unsafeRefreshAccessToken() async {

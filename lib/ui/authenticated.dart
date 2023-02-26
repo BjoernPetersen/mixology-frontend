@@ -16,7 +16,9 @@ class Authenticated extends StatelessWidget {
         if (state.stage == AuthStage.loggedIn) {
           return BlocProvider(
             create: (_) => MixologyBloc(state.authManager),
-            child: builder(context),
+            child: LogoutListener(
+              child: builder(context),
+            ),
           );
         } else {
           return const CircularProgressIndicator();
@@ -31,6 +33,28 @@ class Authenticated extends StatelessWidget {
             context.go('/auth/login');
         }
       },
+    );
+  }
+}
+
+class LogoutListener extends StatelessWidget {
+  final Widget child;
+
+  const LogoutListener({
+    required this.child,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<MixologyBloc, MixologyState>(
+      listener: (context, state) {
+        if (state.loggedOut) {
+          BlocProvider.of<AuthBloc>(context).add(const LogoutEvent());
+          context.go('/auth/login');
+        }
+      },
+      child: child,
     );
   }
 }

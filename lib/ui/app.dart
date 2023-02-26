@@ -12,25 +12,34 @@ import 'package:url_launcher/url_launcher.dart';
 
 class MixologyApp extends StatelessWidget {
   final Uri apiBaseUrl;
+  final String? initialRefreshToken;
   final RouterConfig<Object> _router;
 
   MixologyApp({
     super.key,
     required this.apiBaseUrl,
+    required this.initialRefreshToken,
   }) : _router = _createRouter();
 
-  static void run(Uri apiBaseUrl) {
+  static void run(
+    Uri apiBaseUrl, {
+    String? refreshToken,
+  }) {
     Bloc.transformer = sequential();
     usePathUrlStrategy();
     runApp(MixologyApp(
       apiBaseUrl: apiBaseUrl,
+      initialRefreshToken: refreshToken,
     ));
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => AuthBloc(apiBaseUrl: apiBaseUrl),
+      create: (_) => AuthBloc(
+        apiBaseUrl: apiBaseUrl,
+        initialRefreshToken: initialRefreshToken,
+      ),
       lazy: false,
       child: MaterialApp.router(
         title: 'Mixology',

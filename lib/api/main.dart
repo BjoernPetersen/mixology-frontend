@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:frontend/api/util.dart';
 import 'package:frontend/auth_manager.dart';
-import 'package:meta/meta.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/retry.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:meta/meta.dart';
 
 part 'main.g.dart';
 
@@ -17,13 +17,9 @@ abstract class MixologyApi {
   FutureOr<void> close();
 
   factory MixologyApi.http({
-    required Uri baseUri,
     required AuthManager authManager,
   }) =>
-      _HttpMixologyApi(
-        baseUri: baseUri,
-        authManager: authManager,
-      );
+      _HttpMixologyApi(authManager: authManager);
 }
 
 @immutable
@@ -65,7 +61,6 @@ class _HttpMixologyApi implements MixologyApi {
   final http.Client _client;
 
   _HttpMixologyApi({
-    required Uri baseUri,
     required AuthManager authManager,
   })  : _client = RetryClient(
           _AuthClient(
@@ -73,7 +68,7 @@ class _HttpMixologyApi implements MixologyApi {
             authManager: authManager,
           ),
         ),
-        _baseUri = baseUri;
+        _baseUri = authManager.apiBaseUri;
 
   @override
   Future<AccountInfoResponse> getAccountInfo() async {

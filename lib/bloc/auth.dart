@@ -22,6 +22,11 @@ class LoginEvent implements _AuthEvent {
 }
 
 @immutable
+class LogoutEvent implements _AuthEvent {
+  const LogoutEvent();
+}
+
+@immutable
 class UserAuthorizedEvent implements _AuthEvent {
   final String? code;
   final String? error;
@@ -108,10 +113,18 @@ class AuthBloc extends Bloc<_AuthEvent, AuthState> {
   final AuthApi _api;
   late final AuthManager _authManager;
 
-  AuthBloc({required Uri apiBaseUrl})
-      : _api = AuthApi.http(apiBaseUrl),
+  AuthBloc({
+    required Uri apiBaseUrl,
+    required String? initialRefreshToken,
+  })  : _api = AuthApi.http(apiBaseUrl),
         super(AuthState.loading()) {
     _authManager = AuthManager(_api);
+    if (initialRefreshToken != null) {
+      _authManager.updateToken(
+        refreshToken: initialRefreshToken,
+        accessToken: null,
+      );
+    }
 
     on<_AuthEvent>(_onEvent);
 
@@ -125,6 +138,9 @@ class AuthBloc extends Bloc<_AuthEvent, AuthState> {
       return _login(event, emit);
     } else if (event is UserAuthorizedEvent) {
       return _userAuthorized(event, emit);
+    } else if (event is LogoutEvent) {
+      emit(AuthState.loginRequired());
+      return Future.value();
     } else {
       throw ArgumentError.value(event, 'event', 'unknown even type');
     }
@@ -176,5 +192,11 @@ class AuthBloc extends Bloc<_AuthEvent, AuthState> {
     );
 
     emit(AuthState.loggedIn(_authManager));
+  }
+
+  @override
+  Future<void> close() async {
+    await _api.close();
+    await super.close();
   }
 }
