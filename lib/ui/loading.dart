@@ -12,9 +12,8 @@ class LoadingAction<B extends Bloc<Object, S>, S, T> extends StatelessWidget {
 
   LoadingAction({
     super.key,
-   required this.builder,
-    @Deprecated('use builder')
-     Widget? child,
+    required this.builder,
+    @Deprecated('use builder') Widget? child,
     required this.getLoadable,
     bool Function(T)? isActive,
     this.onError,
