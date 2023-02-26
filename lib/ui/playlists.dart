@@ -71,18 +71,25 @@ class _PlaylistsPagerState extends State<_PlaylistsPager> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<MixologyBloc, MixologyState>(
+    return BlocConsumer<MixologyBloc, MixologyState>(
       listener: (context, state) {
         final playlists = state.playlists;
         if (playlists is LoadingError<PlaylistPage>) {
           showErrorSnackBar(context, playlists);
         }
       },
-      child: Column(
+      buildWhen: (pre, post) {
+        return (pre.playlists is Loading<PlaylistPage>) !=
+            (post.playlists is Loading<PlaylistPage>);
+      },
+      builder: (context, state) => Column(
         mainAxisSize: MainAxisSize.max,
-        children: const [
-          Expanded(child: _CurrentPlaylistPage()),
-          ButtonBar(
+        children: [
+          const Expanded(child: _CurrentPlaylistPage()),
+          if (state.playlists is Loading<PlaylistPage> &&
+              state.playlists is Loaded<PlaylistPage>)
+            const LinearProgressIndicator(),
+          const ButtonBar(
             children: [
               _PreviousPageButton(),
               _NextPageButton(),

@@ -164,7 +164,7 @@ class MixologyBloc extends Bloc<_MixologyEvent, MixologyState> {
     ListPlaylists event,
     Emitter<MixologyState> emit,
   ) async {
-    emit(state.copyWith(playlists: Loading()));
+    emit(state.copyWith(playlists: Loading(state.playlists)));
 
     final nextFrom = event.nextFrom;
     final previousFrom = event.previousFrom;
@@ -199,6 +199,8 @@ class MixologyBloc extends Bloc<_MixologyEvent, MixologyState> {
         load = paginator.nextPage().then((p) => p!.page);
       }
     }
+
+    await Future.delayed(Duration(seconds: 1));
 
     try {
       final result = await load;
