@@ -88,12 +88,12 @@ class AccountInfoCard extends StatelessWidget {
               children: [
                 LoadingAction<MixologyBloc, MixologyState, void>(
                   getLoadable: (state) => state.accountDeletion,
-                  child: const _DeleteAccountButton(),
+                  builder: (context, _) => const _DeleteAccountButton(),
                 ),
                 LoadingAction<MixologyBloc, MixologyState, AccountInfoResponse>(
                   getLoadable: (state) => state.accountInfo,
                   onError: showErrorSnackBar,
-                  child: const _RefreshAccountButton(),
+                  builder: (context, _) => const _RefreshAccountButton(),
                 ),
               ],
             ),

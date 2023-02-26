@@ -5,14 +5,16 @@ import 'package:frontend/loadable.dart';
 export 'package:frontend/loadable.dart';
 
 class LoadingAction<B extends Bloc<Object, S>, S, T> extends StatelessWidget {
-  final Widget child;
+  final Widget Function(BuildContext, T? value) builder;
   final Loadable<T> Function(S) getLoadable;
   final bool Function(T) isActive;
   final void Function(BuildContext, LoadingError)? onError;
 
   LoadingAction({
     super.key,
-    required this.child,
+   required this.builder,
+    @Deprecated('use builder')
+     Widget? child,
     required this.getLoadable,
     bool Function(T)? isActive,
     this.onError,
@@ -32,19 +34,20 @@ class LoadingAction<B extends Bloc<Object, S>, S, T> extends StatelessWidget {
       },
       builder: (context, state) {
         final loadable = getLoadable(state);
+        final value = (loadable is Loaded<T>) ? loadable.value : null;
         if (loadable is Loading<T> ||
             (loadable is Loaded<T> && !isActive(loadable.value))) {
           return AbsorbPointer(
             child: Opacity(
               opacity: 0.5,
-              child: child,
+              child: builder(context, value),
             ),
           );
         }
 
         // TODO: handle error
 
-        return child;
+        return builder(context, value);
       },
     );
   }

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/api/mixology.dart';
 import 'package:frontend/bloc/auth.dart';
 import 'package:frontend/bloc/mixology.dart';
 import 'package:frontend/ui/authenticated.dart';
@@ -68,7 +69,9 @@ class _PlaylistsPagerState extends State<_PlaylistsPager> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<MixologyBloc>(context).add(const ListPlaylists());
+    final bloc = BlocProvider.of<MixologyBloc>(context);
+    bloc.add(const ListPlaylists());
+    bloc.add(GetMixPlaylists());
   }
 
   @override
@@ -109,7 +112,7 @@ class _PreviousPageButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LoadingAction<MixologyBloc, MixologyState, PlaylistPage>(
-      child: TextButton(
+      builder: (context, _) => TextButton(
         onPressed: () {
           final bloc = BlocProvider.of<MixologyBloc>(context);
           final playlists = bloc.state.playlists as Loaded<PlaylistPage>;
@@ -131,7 +134,7 @@ class _NextPageButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LoadingAction<MixologyBloc, MixologyState, PlaylistPage>(
-      child: TextButton(
+      builder: (context, _) => TextButton(
         onPressed: () {
           final bloc = BlocProvider.of<MixologyBloc>(context);
           final playlists = bloc.state.playlists as Loaded<PlaylistPage>;
@@ -227,6 +230,7 @@ class _PlaylistCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
         leading: _PlaylistKindIndicator(playlist),
+        trailing: _MixPlaylistStatus(playlist),
       ),
     );
   }
@@ -239,7 +243,6 @@ class _PlaylistKindIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const double iconSize = 30;
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         final ownId = state.spotifyUserId;
@@ -248,7 +251,7 @@ class _PlaylistKindIndicator extends StatelessWidget {
             message: 'A collaborative playlist',
             child: Icon(
               Icons.group,
-              size: iconSize,
+              size: kIconSize,
             ),
           );
         } else if (playlist.owner.id == ownId) {
@@ -257,7 +260,7 @@ class _PlaylistKindIndicator extends StatelessWidget {
               message: 'Your public playlist',
               child: Icon(
                 Icons.public,
-                size: iconSize,
+                size: kIconSize,
               ),
             );
           } else {
@@ -265,7 +268,7 @@ class _PlaylistKindIndicator extends StatelessWidget {
               message: 'Your private playlist',
               child: Icon(
                 Icons.person,
-                size: iconSize,
+                size: kIconSize,
               ),
             );
           }
@@ -274,11 +277,49 @@ class _PlaylistKindIndicator extends StatelessWidget {
             message: "Someone else's playlist",
             child: Icon(
               Icons.not_interested,
-              size: iconSize,
+              size: kIconSize,
             ),
           );
         }
       },
+    );
+  }
+}
+
+class _MixPlaylistStatus extends StatelessWidget {
+  final Playlist<PageRef<PlaylistTrack>> playlist;
+
+  const _MixPlaylistStatus(this.playlist);
+
+  @override
+  Widget build(BuildContext context) {
+    final ownId = BlocProvider.of<AuthBloc>(context).state.spotifyUserId;
+    final isMixable = playlist.isCollaborative || playlist.owner.id == ownId;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Icon(Icons.shuffle),
+        LoadingAction<MixologyBloc, MixologyState, List<MixPlaylistResponse>>(
+          builder: (context, value) => Checkbox(
+            tristate: value == null,
+            value: value?.any((element) => element.id == playlist.id),
+            onChanged: (newValue) {
+              if (newValue == null) {
+                return;
+              }
+
+              final bloc = BlocProvider.of<MixologyBloc>(context);
+              if (newValue) {
+                bloc.add(AddMixPlaylist(playlist.id));
+              } else {
+                bloc.add(DeleteMixPlaylist(playlist.id));
+              }
+            },
+          ),
+          getLoadable: (s) => s.mixPlaylists,
+          isActive: (s) => isMixable,
+        ),
+      ],
     );
   }
 }

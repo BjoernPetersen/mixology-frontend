@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:frontend/api/mixology.dart';
 import 'package:frontend/auth_manager.dart';
 import 'package:frontend/loadable.dart';
@@ -24,6 +25,26 @@ class GetAccount implements _MixologyEvent {
 
 class DeleteAccount implements _MixologyEvent {
   const DeleteAccount();
+}
+
+class GetMixPlaylists implements _MixologyEvent {
+  final DateTime maxAge;
+
+  GetMixPlaylists([
+    Duration maxAge = const Duration(seconds: 10),
+  ]) : maxAge = DateTime.now().subtract(maxAge);
+}
+
+class AddMixPlaylist implements _MixologyEvent {
+  final String playlistId;
+
+  const AddMixPlaylist(this.playlistId);
+}
+
+class DeleteMixPlaylist implements _MixologyEvent {
+  final String playlistId;
+
+  const DeleteMixPlaylist(this.playlistId);
 }
 
 typedef PlaylistPage = Page<Playlist<PageRef<PlaylistTrack>>>;
@@ -57,19 +78,22 @@ class MixologyState {
   final Loadable<void> accountDeletion;
   final Loadable<AccountInfoResponse> accountInfo;
   final Loadable<PlaylistPage> playlists;
+  final Loadable<List<MixPlaylistResponse>> mixPlaylists;
 
   const MixologyState._({
     required this.loggedOut,
     required this.accountDeletion,
     required this.accountInfo,
     required this.playlists,
+    required this.mixPlaylists,
   });
 
   const MixologyState._unloaded({
     required this.loggedOut,
   })  : accountDeletion = const Unloaded(),
         accountInfo = const Unloaded(),
-        playlists = const Unloaded();
+        playlists = const Unloaded(),
+        mixPlaylists = const Unloaded();
 
   factory MixologyState.initial() {
     return const MixologyState._unloaded(loggedOut: false);
@@ -79,12 +103,14 @@ class MixologyState {
     Loadable<void>? accountDeletion,
     Loadable<AccountInfoResponse>? accountInfo,
     Loadable<PlaylistPage>? playlists,
+    Loadable<List<MixPlaylistResponse>>? mixPlaylists,
   }) {
     return MixologyState._(
       loggedOut: loggedOut,
       accountDeletion: accountDeletion ?? this.accountDeletion,
       accountInfo: accountInfo ?? this.accountInfo,
       playlists: playlists ?? this.playlists,
+      mixPlaylists: mixPlaylists ?? this.mixPlaylists,
     );
   }
 
@@ -106,6 +132,9 @@ class MixologyBloc extends Bloc<_MixologyEvent, MixologyState> {
     on<GetAccount>(_getAccount);
     on<DeleteAccount>(_deleteAccount);
     on<ListPlaylists>(_listPlaylists);
+    on<GetMixPlaylists>(_getMixPlaylists, transformer: droppable());
+    on<AddMixPlaylist>(_addMixPlaylist);
+    on<DeleteMixPlaylist>(_deleteMixPlaylist);
   }
 
   bool _isFresh<T>(Loadable<T> value, DateTime maxAge) {
@@ -208,6 +237,76 @@ class MixologyBloc extends Bloc<_MixologyEvent, MixologyState> {
         ),
       ));
     }
+  }
+
+  Future<void> _getMixPlaylists(
+    GetMixPlaylists event,
+    Emitter<MixologyState> emit,
+  ) async {
+    if (_isFresh(state.mixPlaylists, event.maxAge)) {
+      return;
+    }
+
+    emit(state.copyWith(
+      mixPlaylists: Loading(state.mixPlaylists),
+    ));
+
+    final List<MixPlaylistResponse> mixPlaylists;
+    try {
+      mixPlaylists = await _api.getMixPlaylists();
+    } catch (e) {
+      emit(state.copyWith(
+        mixPlaylists: LoadingError(
+          'Could not get mix playlists',
+          state.mixPlaylists,
+        ),
+      ));
+      return;
+    }
+
+    emit(state.copyWith(
+      mixPlaylists: Loaded(mixPlaylists),
+    ));
+  }
+
+  Future<void> _addMixPlaylist(
+    AddMixPlaylist event,
+    Emitter<MixologyState> emit,
+  ) async {
+    emit(state.copyWith(mixPlaylists: Loading(state.mixPlaylists)));
+    // TODO: how to properly package the loading value?
+    try {
+      await _api.addMixPlaylist(event.playlistId);
+    } catch (e) {
+      emit(state.copyWith(
+        mixPlaylists: LoadingError(
+          'Could not add mix playlist',
+          state.mixPlaylists,
+        ),
+      ));
+      return;
+    }
+    add(GetMixPlaylists(Duration.zero));
+  }
+
+  Future<void> _deleteMixPlaylist(
+    DeleteMixPlaylist event,
+    Emitter<MixologyState> emit,
+  ) async {
+    emit(state.copyWith(mixPlaylists: Loading(state.mixPlaylists)));
+    // TODO: how to properly package the loading value?
+    try {
+      await _api.deleteMixPlaylist(event.playlistId);
+    } catch (e) {
+      emit(state.copyWith(
+        mixPlaylists: LoadingError(
+          'Could not remove mix playlist',
+          state.mixPlaylists,
+        ),
+      ));
+      return;
+    }
+    add(GetMixPlaylists(Duration.zero));
   }
 
   @override
