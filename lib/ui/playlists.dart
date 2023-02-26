@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/bloc/mixology.dart';
 import 'package:frontend/ui/authenticated.dart';
 import 'package:frontend/ui/loading.dart';
+import 'package:go_router/go_router.dart';
 import 'package:spotify_api/spotify_api.dart';
 
 class PlaylistsPage extends StatelessWidget {
@@ -12,13 +13,29 @@ class PlaylistsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Your Playlists'),
+    return Authenticated(
+      builder: (context) => Scaffold(
+        appBar: AppBar(
+          title: const Text('Your Playlists'),
+          actions: const [
+            _AccountButton(),
+          ],
+        ),
+        body: const Center(child: _PlaylistsPageBody()),
       ),
-      body: Authenticated(
-        builder: (context) => const Center(child: _PlaylistsPageBody()),
-      ),
+    );
+  }
+}
+
+class _AccountButton extends StatelessWidget {
+  const _AccountButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: () => context.push('/account'),
+      icon: const Icon(Icons.account_circle, size: 40),
+      tooltip: 'My Account',
     );
   }
 }
@@ -140,10 +157,18 @@ class _CurrentPlaylistPage extends StatelessWidget {
             opacity: 0.8,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Icon(Icons.error),
-                SizedBox(height: 10),
-                Text('This content could not be loaded.'),
+              children: [
+                const Icon(Icons.error, size: 50),
+                const SizedBox(height: 10),
+                const Text('This content could not be loaded.'),
+                const SizedBox(height: 10),
+                TextButton(
+                  onPressed: () {
+                    final bloc = BlocProvider.of<MixologyBloc>(context);
+                    bloc.add(const ListPlaylists());
+                  },
+                  child: const Text('Retry'),
+                ),
               ],
             ),
           );

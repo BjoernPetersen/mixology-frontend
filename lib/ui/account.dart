@@ -11,6 +11,9 @@ class AccountPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('My Account'),
+      ),
       body: Authenticated(
         builder: (context) => const _AccountPageBody(),
       ),
