@@ -5,6 +5,8 @@ import 'package:frontend/api/main.dart';
 import 'package:frontend/auth_manager.dart';
 import 'package:frontend/loadable.dart';
 import 'package:meta/meta.dart';
+import 'package:spotify_api/spotify_api.dart';
+import 'package:spotify_api/extension.dart';
 
 @immutable
 abstract class _MixologyEvent {
@@ -64,10 +66,13 @@ class MixologyState {
 class MixologyBloc extends Bloc<_MixologyEvent, MixologyState> {
   final AuthManager _authManager;
   final MixologyApi _api;
+  late final SpotifyWebApi _spotifyApi;
 
   MixologyBloc(this._authManager)
       : _api = MixologyApi.http(authManager: _authManager),
         super(MixologyState.initial()) {
+    _spotifyApi = SpotifyWebApi(refresher: _MixologyAccessTokenRefresher(_api));
+
     on<GetAccount>(_getAccount);
     on<DeleteAccount>(_deleteAccount);
   }
@@ -117,7 +122,25 @@ class MixologyBloc extends Bloc<_MixologyEvent, MixologyState> {
 
   @override
   Future<void> close() async {
+    _spotifyApi.close();
     await _api.close();
     await super.close();
+  }
+}
+
+class _MixologyAccessTokenRefresher implements AccessTokenRefresher {
+  final MixologyApi _api;
+
+  _MixologyAccessTokenRefresher(this._api);
+
+  @override
+  String get clientId {
+    // Not actually used in this implementation
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<TokenInfo> retrieveToken(RequestsClient client) async {
+    return await _api.getSpotifyAccessToken();
   }
 }

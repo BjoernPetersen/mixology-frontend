@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/retry.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
+import 'package:spotify_api/spotify_api.dart';
 
 part 'main.g.dart';
 
@@ -13,6 +14,8 @@ abstract class MixologyApi {
   Future<AccountInfoResponse> getAccountInfo();
 
   Future<void> deleteAccount();
+
+  Future<TokenInfo> getSpotifyAccessToken();
 
   FutureOr<void> close();
 
@@ -37,6 +40,21 @@ class AccountInfoResponse {
 
   factory AccountInfoResponse.fromJson(Json json) =>
       _$AccountInfoResponseFromJson(json);
+}
+
+@immutable
+@JsonSerializable(createToJson: false)
+class AccessTokenResponse {
+  final String token;
+  final DateTime expiresAt;
+
+  const AccessTokenResponse({
+    required this.token,
+    required this.expiresAt,
+  });
+
+  factory AccessTokenResponse.fromJson(Json json) =>
+      _$AccessTokenResponseFromJson(json);
 }
 
 class _AuthClient extends http.BaseClient {
@@ -105,6 +123,29 @@ class _HttpMixologyApi implements MixologyApi {
     if (response.statusCode != 204) {
       throw ResponseStatusException(response.statusCode);
     }
+  }
+
+  @override
+  Future<TokenInfo> getSpotifyAccessToken() async {
+    final client = _client;
+    final url = _baseUri.resolve('/spotify/accessToken');
+
+    final http.Response response;
+    try {
+      response = await client.delete(url);
+    } on http.ClientException catch (e) {
+      throw IoException(e);
+    }
+
+    if (response.statusCode != 200) {
+      throw ResponseStatusException(response.statusCode);
+    }
+
+    final result = response.deserialize(AccessTokenResponse.fromJson);
+    return TokenInfo(
+      value: result.token,
+      expiration: result.expiresAt,
+    );
   }
 
   @override

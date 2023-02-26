@@ -376,6 +376,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.1"
+  logger:
+    dependency: transitive
+    description:
+      name: logger
+      sha256: c40f9ef51e5bffb4ce69ad2d8c8aad7bd47ec109c090521109b63a4e2bc27191
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.2"
   logging:
     dependency: transitive
     description:
@@ -677,6 +685,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.9.1"
+  spotify_api:
+    dependency: "direct main"
+    description:
+      name: spotify_api
+      sha256: f6f533881863784d48de6a42bc41e4e6c9d45435aee33990237e9c4c561857e2
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.1-alpha"
   stack_trace:
     dependency: transitive
     description:
