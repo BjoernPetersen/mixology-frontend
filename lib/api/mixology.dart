@@ -8,7 +8,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
 import 'package:spotify_api/spotify_api.dart';
 
-part 'main.g.dart';
+part 'mixology.g.dart';
 
 abstract class MixologyApi {
   Future<AccountInfoResponse> getAccountInfo();
@@ -16,6 +16,10 @@ abstract class MixologyApi {
   Future<void> deleteAccount();
 
   Future<TokenInfo> getSpotifyAccessToken();
+
+  Future<void> addMixPlaylist(String playlistId);
+  Future<void> deleteMixPlaylist(String playlistId);
+  Future<List<MixPlaylistResponse>> getMixPlaylists();
 
   FutureOr<void> close();
 
@@ -55,6 +59,34 @@ class AccessTokenResponse {
 
   factory AccessTokenResponse.fromJson(Json json) =>
       _$AccessTokenResponseFromJson(json);
+}
+
+@immutable
+@JsonSerializable(createToJson: false)
+class MixPlaylistsResponse {
+  final List<MixPlaylistResponse> playlists;
+
+  const MixPlaylistsResponse(this.playlists);
+
+  factory MixPlaylistsResponse.fromJson(Json json) =>
+      _$MixPlaylistsResponseFromJson(json);
+}
+
+@immutable
+@JsonSerializable(createToJson: false)
+class MixPlaylistResponse {
+  final String id;
+  final String name;
+  final DateTime? lastMix;
+
+  const MixPlaylistResponse({
+    required this.id,
+    required this.name,
+    required this.lastMix,
+  });
+
+  factory MixPlaylistResponse.fromJson(Json json) =>
+      _$MixPlaylistResponseFromJson(json);
 }
 
 class _AuthClient extends http.BaseClient {
@@ -146,6 +178,60 @@ class _HttpMixologyApi implements MixologyApi {
       value: result.token,
       expiration: result.expiresAt,
     );
+  }
+
+  @override
+  Future<void> addMixPlaylist(String playlistId) async {
+    final client = _client;
+    final url = _baseUri.resolve('/mix/$playlistId');
+
+    final http.Response response;
+    try {
+      response = await client.put(url);
+    } on http.ClientException catch (e) {
+      throw IoException(e);
+    }
+
+    if (response.statusCode != 204) {
+      throw ResponseStatusException(response.statusCode);
+    }
+  }
+
+  @override
+  Future<void> deleteMixPlaylist(String playlistId) async {
+    final client = _client;
+    final url = _baseUri.resolve('/mix/$playlistId');
+
+    final http.Response response;
+    try {
+      response = await client.delete(url);
+    } on http.ClientException catch (e) {
+      throw IoException(e);
+    }
+
+    if (response.statusCode != 204) {
+      throw ResponseStatusException(response.statusCode);
+    }
+  }
+
+  @override
+  Future<List<MixPlaylistResponse>> getMixPlaylists() async {
+    final client = _client;
+    final url = _baseUri.resolve('/mix');
+
+    final http.Response response;
+    try {
+      response = await client.get(url);
+    } on http.ClientException catch (e) {
+      throw IoException(e);
+    }
+
+    if (response.statusCode != 200) {
+      throw ResponseStatusException(response.statusCode);
+    }
+
+    final result = response.deserialize(MixPlaylistsResponse.fromJson);
+    return result.playlists;
   }
 
   @override
