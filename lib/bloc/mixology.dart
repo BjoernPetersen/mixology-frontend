@@ -200,8 +200,6 @@ class MixologyBloc extends Bloc<_MixologyEvent, MixologyState> {
       }
     }
 
-    await Future.delayed(Duration(seconds: 1));
-
     try {
       final result = await load;
       emit(state.copyWith(playlists: Loaded(result)));
