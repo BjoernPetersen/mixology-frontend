@@ -43,3 +43,11 @@ class LoadingAction<B extends Bloc<Object, S>, S, T> extends StatelessWidget {
     );
   }
 }
+
+void showErrorSnackBar(BuildContext context, LoadingError errorMessage) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(errorMessage.error),
+    ),
+  );
+}

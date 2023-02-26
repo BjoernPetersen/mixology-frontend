@@ -12,20 +12,20 @@ class AccountPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Authenticated(
-        builder: (context) => const AccountPageBody(),
+        builder: (context) => const _AccountPageBody(),
       ),
     );
   }
 }
 
-class AccountPageBody extends StatefulWidget {
-  const AccountPageBody({super.key});
+class _AccountPageBody extends StatefulWidget {
+  const _AccountPageBody();
 
   @override
-  State<AccountPageBody> createState() => _AccountPageBodyState();
+  State<_AccountPageBody> createState() => _AccountPageBodyState();
 }
 
-class _AccountPageBodyState extends State<AccountPageBody> {
+class _AccountPageBodyState extends State<_AccountPageBody> {
   @override
   void initState() {
     super.initState();
@@ -35,17 +35,13 @@ class _AccountPageBodyState extends State<AccountPageBody> {
   @override
   Widget build(BuildContext context) {
     return const Center(
-      child: AccountInfoCard(
-        child: AccountInfo(),
-      ),
+      child: AccountInfoCard(),
     );
   }
 }
 
 class AccountInfoCard extends StatelessWidget {
-  final Widget child;
-
-  const AccountInfoCard({super.key, required this.child});
+  const AccountInfoCard({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -61,19 +57,19 @@ class AccountInfoCard extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Expanded(child: AccountInfo()),
+            const Expanded(child: _AccountInfo()),
             const Divider(height: 0),
             ButtonBar(
               mainAxisSize: MainAxisSize.max,
               children: [
                 LoadingAction<MixologyBloc, MixologyState, void>(
                   getLoadable: (state) => state.accountDeletion,
-                  child: const DeleteAccountButton(),
+                  child: const _DeleteAccountButton(),
                 ),
                 LoadingAction<MixologyBloc, MixologyState, AccountInfoResponse>(
                   getLoadable: (state) => state.accountInfo,
                   onError: showErrorSnackBar,
-                  child: const RefreshAccountButton(),
+                  child: const _RefreshAccountButton(),
                 ),
               ],
             ),
@@ -84,10 +80,8 @@ class AccountInfoCard extends StatelessWidget {
   }
 }
 
-class AccountInfo extends StatelessWidget {
-  const AccountInfo({
-    super.key,
-  });
+class _AccountInfo extends StatelessWidget {
+  const _AccountInfo();
 
   @override
   Widget build(BuildContext context) {
@@ -132,16 +126,8 @@ class AccountInfo extends StatelessWidget {
   }
 }
 
-void showErrorSnackBar(BuildContext context, LoadingError errorMessage) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(errorMessage.error),
-    ),
-  );
-}
-
-class RefreshAccountButton extends StatelessWidget {
-  const RefreshAccountButton({super.key});
+class _RefreshAccountButton extends StatelessWidget {
+  const _RefreshAccountButton();
 
   @override
   Widget build(BuildContext context) {
@@ -155,8 +141,8 @@ class RefreshAccountButton extends StatelessWidget {
   }
 }
 
-class DeleteAccountButton extends StatelessWidget {
-  const DeleteAccountButton({super.key});
+class _DeleteAccountButton extends StatelessWidget {
+  const _DeleteAccountButton();
 
   @override
   Widget build(BuildContext context) {
