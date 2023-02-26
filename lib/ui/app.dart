@@ -7,6 +7,7 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:frontend/bloc/auth.dart';
 import 'package:frontend/color_schemes.dart';
 import 'package:frontend/ui/account.dart';
+import 'package:frontend/ui/playlists.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -62,6 +63,10 @@ RouterConfig<Object> _createRouter() {
     routes: [
       GoRoute(
         path: '/',
+        builder: (context, state) => const PlaylistsPage(),
+      ),
+      GoRoute(
+        path: '/account',
         builder: (context, state) => const AccountPage(),
       ),
       GoRoute(

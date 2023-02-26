@@ -7,14 +7,16 @@ export 'package:frontend/loadable.dart';
 class LoadingAction<B extends Bloc<Object, S>, S, T> extends StatelessWidget {
   final Widget child;
   final Loadable<T> Function(S) getLoadable;
+  final bool Function(T) isActive;
   final void Function(BuildContext, LoadingError)? onError;
 
-  const LoadingAction({
+  LoadingAction({
     super.key,
     required this.child,
     required this.getLoadable,
+    bool Function(T)? isActive,
     this.onError,
-  });
+  }) : isActive = (isActive ?? (_) => true);
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +32,8 @@ class LoadingAction<B extends Bloc<Object, S>, S, T> extends StatelessWidget {
       },
       builder: (context, state) {
         final loadable = getLoadable(state);
-        if (loadable is Loading<T>) {
+        if (loadable is Loading<T> ||
+            (loadable is Loaded<T> && !isActive(loadable.value))) {
           return AbsorbPointer(
             child: Opacity(
               opacity: 0.5,
@@ -38,6 +41,9 @@ class LoadingAction<B extends Bloc<Object, S>, S, T> extends StatelessWidget {
             ),
           );
         }
+
+        // TODO: handle error
+
         return child;
       },
     );

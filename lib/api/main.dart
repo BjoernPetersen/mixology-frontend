@@ -132,7 +132,7 @@ class _HttpMixologyApi implements MixologyApi {
 
     final http.Response response;
     try {
-      response = await client.delete(url);
+      response = await client.get(url);
     } on http.ClientException catch (e) {
       throw IoException(e);
     }

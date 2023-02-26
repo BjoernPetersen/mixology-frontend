@@ -26,10 +26,12 @@ class DeleteAccount implements _MixologyEvent {
   const DeleteAccount();
 }
 
+typedef PlaylistPage = Page<Playlist<PageRef<PlaylistTrack>>>;
+
 class ListPlaylists implements _MixologyEvent {
   final int? pageSize;
-  final Page<Playlist<PageRef<PlaylistTrack>>>? nextFrom;
-  final Page<Playlist<PageRef<PlaylistTrack>>>? previousFrom;
+  final PlaylistPage? nextFrom;
+  final PlaylistPage? previousFrom;
 
   const ListPlaylists({
     this.pageSize,
@@ -38,12 +40,12 @@ class ListPlaylists implements _MixologyEvent {
 
   const ListPlaylists.next({
     this.pageSize,
-    required Page<Playlist<PageRef<PlaylistTrack>>>? from,
+    required PlaylistPage? from,
   })  : nextFrom = from,
         previousFrom = null;
 
   const ListPlaylists.previous({
-    required Page<Playlist<PageRef<PlaylistTrack>>>? from,
+    required PlaylistPage? from,
   })  : pageSize = null,
         nextFrom = null,
         previousFrom = from;
@@ -54,7 +56,7 @@ class MixologyState {
   final bool loggedOut;
   final Loadable<void> accountDeletion;
   final Loadable<AccountInfoResponse> accountInfo;
-  final Loadable<Page<Playlist<PageRef<PlaylistTrack>>>> playlists;
+  final Loadable<PlaylistPage> playlists;
 
   const MixologyState._({
     required this.loggedOut,
@@ -76,7 +78,7 @@ class MixologyState {
   MixologyState copyWith({
     Loadable<void>? accountDeletion,
     Loadable<AccountInfoResponse>? accountInfo,
-    Loadable<Page<Playlist<PageRef<PlaylistTrack>>>>? playlists,
+    Loadable<PlaylistPage>? playlists,
   }) {
     return MixologyState._(
       loggedOut: loggedOut,
@@ -167,7 +169,7 @@ class MixologyBloc extends Bloc<_MixologyEvent, MixologyState> {
     final nextFrom = event.nextFrom;
     final previousFrom = event.previousFrom;
 
-    final Future<Page<Playlist<PageRef<PlaylistTrack>>>> load;
+    final Future<PlaylistPage> load;
     if (nextFrom == null && previousFrom == null) {
       // Load initial set
       load = _spotifyApi.playlists.getCurrentUsersPlaylists();
@@ -196,18 +198,18 @@ class MixologyBloc extends Bloc<_MixologyEvent, MixologyState> {
         }
         load = paginator.nextPage().then((p) => p!.page);
       }
+    }
 
-      try {
-        final result = await load;
-        emit(state.copyWith(playlists: Loaded(result)));
-      } catch (e) {
-        emit(state.copyWith(
-          playlists: LoadingError(
-            'Could not load playlists',
-            state.playlists,
-          ),
-        ));
-      }
+    try {
+      final result = await load;
+      emit(state.copyWith(playlists: Loaded(result)));
+    } catch (e) {
+      emit(state.copyWith(
+        playlists: LoadingError(
+          'Could not load playlists',
+          state.playlists,
+        ),
+      ));
     }
   }
 
