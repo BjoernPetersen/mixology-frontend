@@ -207,7 +207,7 @@ class _AppLogo extends StatelessWidget {
     return ClipRRect(
       borderRadius: const BorderRadius.all(Radius.circular(50)),
       child: Image.asset(
-        'logo.png',
+        'assets/logo.png',
         width: min(MediaQuery.of(context).size.width - 20, 200),
         filterQuality: FilterQuality.high,
       ),
