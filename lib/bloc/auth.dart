@@ -45,6 +45,7 @@ enum AuthStage {
 class AuthState {
   final AuthStage stage;
   final Uri? _authorizationUrl;
+  final AuthManager? _authManager;
   final String? error;
 
   Uri get authorizationUrl {
@@ -57,11 +58,22 @@ class AuthState {
     }
   }
 
+  AuthManager get authManager {
+    if (stage == AuthStage.loggedIn) {
+      return _authManager!;
+    } else {
+      throw StateError(
+        'Authorization URL is only available in userAuthorization stage',
+      );
+    }
+  }
+
   const AuthState._({
     required this.stage,
     Uri? authorizationUrl,
+    AuthManager? authManager,
     this.error,
-  }) : _authorizationUrl = authorizationUrl;
+  }) : _authorizationUrl = authorizationUrl, _authManager=authManager;
 
   factory AuthState.loading() {
     return const AuthState._(
@@ -83,9 +95,10 @@ class AuthState {
     );
   }
 
-  factory AuthState.loggedIn() {
-    return const AuthState._(
+  factory AuthState.loggedIn(AuthManager authManager) {
+    return  AuthState._(
       stage: AuthStage.loggedIn,
+      authManager: authManager,
     );
   }
 }
@@ -118,7 +131,7 @@ class AuthBloc extends Bloc<_AuthEvent, AuthState> {
 
   Future<void> _init(_InitEvent event, Emitter<AuthState> emit) async {
     if (await _authManager.hasRefreshToken) {
-      emit(AuthState.loggedIn());
+      emit(AuthState.loggedIn(_authManager));
     } else {
       emit(AuthState.loginRequired());
     }
@@ -161,6 +174,6 @@ class AuthBloc extends Bloc<_AuthEvent, AuthState> {
       accessToken: response.accessToken,
     );
 
-    emit(AuthState.loggedIn());
+    emit(AuthState.loggedIn(_authManager));
   }
 }

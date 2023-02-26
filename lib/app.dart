@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:frontend/bloc/auth.dart';
+import 'package:frontend/bloc/mixology.dart';
 import 'package:frontend/color_schemes.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -131,7 +132,10 @@ class Authenticated extends StatelessWidget {
     return BlocConsumer<AuthBloc, AuthState>(
       builder: (context, state) {
         if (state.stage == AuthStage.loggedIn) {
-          return builder(context);
+          return BlocProvider(
+            create: (_) => MixologyBloc(state.authManager),
+            child: builder(context),
+          );
         } else {
           return const CircularProgressIndicator();
         }

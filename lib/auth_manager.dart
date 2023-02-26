@@ -64,6 +64,8 @@ class AuthManager {
     }));
   }
 
+  Uri get apiBaseUri => _authApi.baseUri;
+
   Future<bool> get hasRefreshToken async {
     return await _mutex.protect(() async {
       final refreshToken = _refreshToken;

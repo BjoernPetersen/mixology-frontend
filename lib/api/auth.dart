@@ -9,6 +9,8 @@ import 'package:meta/meta.dart';
 part 'auth.g.dart';
 
 abstract class AuthApi {
+  Uri get baseUri;
+
   Future<LoginResponse> startLogin();
 
   Future<TokenPairResponse> loginCallback({
@@ -67,15 +69,16 @@ class TokenPairResponse {
 }
 
 class _HttpAuthApi implements AuthApi {
-  final Uri _baseUri;
+  @override
+  final Uri baseUri;
   final http.Client _client;
 
-  _HttpAuthApi(this._baseUri) : _client = RetryClient(http.Client());
+  _HttpAuthApi(this.baseUri) : _client = RetryClient(http.Client());
 
   @override
   Future<LoginResponse> startLogin() async {
     final client = _client;
-    final url = _baseUri.resolve('/auth/login');
+    final url = baseUri.resolve('/auth/login');
 
     final http.Response response;
     try {
@@ -99,7 +102,7 @@ class _HttpAuthApi implements AuthApi {
     required String? error,
   }) async {
     final client = _client;
-    final url = _baseUri.resolve('/auth/callback').replace(
+    final url = baseUri.resolve('/auth/callback').replace(
       queryParameters: {
         'state': state,
         if (code != null) 'code': code,
@@ -127,7 +130,7 @@ class _HttpAuthApi implements AuthApi {
     required String refreshToken,
   }) async {
     final client = _client;
-    final url = _baseUri.resolve('/auth/refresh');
+    final url = baseUri.resolve('/auth/refresh');
 
     final http.Response response;
     try {

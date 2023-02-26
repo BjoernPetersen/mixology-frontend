@@ -18,11 +18,11 @@ abstract class MixologyApi {
 
   factory MixologyApi.http({
     required Uri baseUri,
-    required AuthManager tokenManager,
+    required AuthManager authManager,
   }) =>
       _HttpMixologyApi(
         baseUri: baseUri,
-        authManager: tokenManager,
+        authManager: authManager,
       );
 }
 
