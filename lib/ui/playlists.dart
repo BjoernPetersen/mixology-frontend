@@ -213,9 +213,20 @@ class _PlaylistCard extends StatelessWidget {
     final description = playlist.description;
     return Card(
       child: ListTile(
-        title: Text(playlist.name),
-        subtitle: description == null ? null : Text(description),
-        trailing: _PlaylistKindIndicator(playlist),
+        title: Text(
+          playlist.name,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        subtitle: description == null
+            ? null
+            : Text(
+                description,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+        leading: _PlaylistKindIndicator(playlist),
       ),
     );
   }
@@ -228,30 +239,43 @@ class _PlaylistKindIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const double iconSize = 30;
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         final ownId = state.spotifyUserId;
         if (playlist.isCollaborative) {
           return const Tooltip(
             message: 'A collaborative playlist',
-            child: Icon(Icons.group),
+            child: Icon(
+              Icons.group,
+              size: iconSize,
+            ),
           );
         } else if (playlist.owner.id == ownId) {
           if (playlist.isPublic == true) {
             return const Tooltip(
               message: 'Your public playlist',
-              child: Icon(Icons.public),
+              child: Icon(
+                Icons.public,
+                size: iconSize,
+              ),
             );
           } else {
             return const Tooltip(
               message: 'Your private playlist',
-              child: Icon(Icons.person),
+              child: Icon(
+                Icons.person,
+                size: iconSize,
+              ),
             );
           }
         } else {
           return const Tooltip(
             message: "Someone else's playlist",
-            child: Icon(Icons.not_interested),
+            child: Icon(
+              Icons.not_interested,
+              size: iconSize,
+            ),
           );
         }
       },
