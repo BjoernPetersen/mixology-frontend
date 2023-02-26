@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:frontend/api/main.dart';
+import 'package:frontend/api/mixology.dart';
 import 'package:frontend/auth_manager.dart';
 import 'package:frontend/loadable.dart';
 import 'package:meta/meta.dart';
