@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter/material.dart';
@@ -158,11 +159,15 @@ class AuthGuide extends StatelessWidget {
             return Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (error != null) Text(error),
+                const _AppLogo(),
+                const SizedBox(height: 30),
                 LoginButton(
-                  action: () => BlocProvider.of<AuthBloc>(context)
-                      .add(const LoginEvent()),
+                  action: () {
+                    final bloc = BlocProvider.of<AuthBloc>(context);
+                    bloc.add(const LoginEvent());
+                  },
                 ),
+                if (error != null) Text(error),
               ],
             );
           case AuthStage.userAuthorization:
@@ -190,6 +195,22 @@ class AuthGuide extends StatelessWidget {
             break;
         }
       },
+    );
+  }
+}
+
+class _AppLogo extends StatelessWidget {
+  const _AppLogo();
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: const BorderRadius.all(Radius.circular(50)),
+      child: Image.asset(
+        'logo.png',
+        width: min(MediaQuery.of(context).size.width - 20, 200),
+        filterQuality: FilterQuality.high,
+      ),
     );
   }
 }
