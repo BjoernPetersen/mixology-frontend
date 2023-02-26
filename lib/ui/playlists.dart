@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/bloc/auth.dart';
 import 'package:frontend/bloc/mixology.dart';
 import 'package:frontend/ui/authenticated.dart';
 import 'package:frontend/ui/loading.dart';
@@ -195,17 +196,64 @@ class _PlaylistsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemBuilder: (context, index) {
-        final playlist = playlists[index];
-        final description = playlist.description;
-        return Card(
-          child: ListTile(
-            title: Text(playlist.name),
-            subtitle: description == null ? null : Text(description),
-          ),
-        );
-      },
+      itemBuilder: (context, index) => _PlaylistCard(playlists[index]),
       itemCount: playlists.length,
+    );
+  }
+}
+
+class _PlaylistCard extends StatelessWidget {
+  final Playlist<PageRef<PlaylistTrack>> playlist;
+
+  const _PlaylistCard(this.playlist);
+
+  @override
+  Widget build(BuildContext context) {
+    final description = playlist.description;
+    return Card(
+      child: ListTile(
+        title: Text(playlist.name),
+        subtitle: description == null ? null : Text(description),
+        trailing: _PlaylistKindIndicator(playlist),
+      ),
+    );
+  }
+}
+
+class _PlaylistKindIndicator extends StatelessWidget {
+  final Playlist<PageRef<PlaylistTrack>> playlist;
+
+  const _PlaylistKindIndicator(this.playlist);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        final ownId = state.spotifyUserId;
+        if (playlist.isCollaborative) {
+          return const Tooltip(
+            message: 'A collaborative playlist',
+            child: Icon(Icons.group),
+          );
+        } else if (playlist.owner.id == ownId) {
+          if (playlist.isPublic == true) {
+            return const Tooltip(
+              message: 'Your public playlist',
+              child: Icon(Icons.public),
+            );
+          } else {
+            return const Tooltip(
+              message: 'Your private playlist',
+              child: Icon(Icons.person),
+            );
+          }
+        } else {
+          return const Tooltip(
+            message: "Someone else's playlist",
+            child: Icon(Icons.not_interested),
+          );
+        }
+      },
     );
   }
 }

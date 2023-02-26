@@ -13,10 +13,12 @@ const _refreshTokenKey = 'refreshToken';
 class Token {
   final String value;
   final DateTime expiration;
+  final String? spotifyId;
 
   const Token({
     required this.value,
     required this.expiration,
+    required this.spotifyId,
   });
 
   bool get expiresSoon {
@@ -31,10 +33,13 @@ class Token {
     final jwt = JWT.decode(value);
     final expiration = DateTime.fromMillisecondsSinceEpoch(
       Duration(seconds: jwt.payload['exp']!).inMilliseconds,
+      isUtc: true,
     );
+    final spotifyId = jwt.payload['spotifyId'];
     return Token(
       value: value,
       expiration: expiration,
+      spotifyId: spotifyId,
     );
   }
 }
@@ -65,6 +70,22 @@ class AuthManager {
   }
 
   Uri get apiBaseUri => _authApi.baseUri;
+
+  Future<String> get spotifyUserId async {
+    final refreshToken = _refreshToken;
+    if (refreshToken == null) {
+      throw LoginRequiredException();
+    }
+
+    String? spotifyId = refreshToken.spotifyId;
+
+    if (spotifyId != null) {
+      return spotifyId;
+    }
+
+    final accessToken = await this.accessToken;
+    return Token.fromValue(accessToken).spotifyId!;
+  }
 
   Future<void> logout() async {
     await _mutex.protect(() async {

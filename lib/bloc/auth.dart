@@ -51,6 +51,7 @@ class AuthState {
   final AuthStage stage;
   final Uri? _authorizationUrl;
   final AuthManager? _authManager;
+  final String? _spotifyUserId;
   final String? error;
 
   Uri get authorizationUrl {
@@ -68,7 +69,17 @@ class AuthState {
       return _authManager!;
     } else {
       throw StateError(
-        'Authorization URL is only available in userAuthorization stage',
+        'authManager is only available in loggedIn stage',
+      );
+    }
+  }
+
+  String get spotifyUserId {
+    if (stage == AuthStage.loggedIn) {
+      return _spotifyUserId!;
+    } else {
+      throw StateError(
+        'spotifyUserId is only available in loggedIn stage',
       );
     }
   }
@@ -77,9 +88,11 @@ class AuthState {
     required this.stage,
     Uri? authorizationUrl,
     AuthManager? authManager,
+    String? spotifyUserId,
     this.error,
   })  : _authorizationUrl = authorizationUrl,
-        _authManager = authManager;
+        _authManager = authManager,
+        _spotifyUserId = spotifyUserId;
 
   factory AuthState.loading() {
     return const AuthState._(
@@ -101,10 +114,14 @@ class AuthState {
     );
   }
 
-  factory AuthState.loggedIn(AuthManager authManager) {
+  factory AuthState.loggedIn({
+    required AuthManager authManager,
+    required String spotifyUserId,
+  }) {
     return AuthState._(
       stage: AuthStage.loggedIn,
       authManager: authManager,
+      spotifyUserId: spotifyUserId,
     );
   }
 }
@@ -148,7 +165,11 @@ class AuthBloc extends Bloc<_AuthEvent, AuthState> {
 
   Future<void> _init(_InitEvent event, Emitter<AuthState> emit) async {
     if (await _authManager.hasRefreshToken) {
-      emit(AuthState.loggedIn(_authManager));
+      final spotifyUserId = await _authManager.spotifyUserId;
+      emit(AuthState.loggedIn(
+        authManager: _authManager,
+        spotifyUserId: spotifyUserId,
+      ));
     } else {
       emit(AuthState.loginRequired());
     }
@@ -191,7 +212,11 @@ class AuthBloc extends Bloc<_AuthEvent, AuthState> {
       accessToken: response.accessToken,
     );
 
-    emit(AuthState.loggedIn(_authManager));
+    final spotifyUserId = await _authManager.spotifyUserId;
+    emit(AuthState.loggedIn(
+      authManager: _authManager,
+      spotifyUserId: spotifyUserId,
+    ));
   }
 
   @override
