@@ -93,12 +93,11 @@ class MixologyState {
 }
 
 class MixologyBloc extends Bloc<_MixologyEvent, MixologyState> {
-  final AuthManager _authManager;
   final MixologyApi _api;
   late final SpotifyWebApi _spotifyApi;
 
-  MixologyBloc(this._authManager)
-      : _api = MixologyApi.http(authManager: _authManager),
+  MixologyBloc(AuthManager authManager)
+      : _api = MixologyApi.http(authManager: authManager),
         super(MixologyState.initial()) {
     _spotifyApi = SpotifyWebApi(
       refresher: _MixologyAccessTokenRefresher(_api),
