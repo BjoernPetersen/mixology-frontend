@@ -18,8 +18,16 @@ abstract class MixologyApi {
   Future<TokenInfo> getSpotifyAccessToken();
 
   Future<void> addMixPlaylist(String playlistId);
+
   Future<void> deleteMixPlaylist(String playlistId);
+
   Future<List<MixPlaylistResponse>> getMixPlaylists();
+
+  Future<void> addCopyMixPlaylist(String? playlistId);
+
+  Future<void> deleteCopyMixPlaylist(String targetId);
+
+  Future<List<CopyMixPlaylistResponse>> getCopyMixPlaylists();
 
   FutureOr<void> close();
 
@@ -87,6 +95,34 @@ class MixPlaylistResponse {
 
   factory MixPlaylistResponse.fromJson(Json json) =>
       _$MixPlaylistResponseFromJson(json);
+}
+
+@immutable
+@JsonSerializable(createToJson: false)
+class CopyMixPlaylistsResponse {
+  final List<CopyMixPlaylistResponse> playlists;
+
+  const CopyMixPlaylistsResponse(this.playlists);
+
+  factory CopyMixPlaylistsResponse.fromJson(Json json) =>
+      _$CopyMixPlaylistsResponseFromJson(json);
+}
+
+@immutable
+@JsonSerializable(createToJson: false)
+class CopyMixPlaylistResponse {
+  final String? sourceId;
+  final String targetId;
+  final DateTime? lastMix;
+
+  const CopyMixPlaylistResponse({
+    required this.sourceId,
+    required this.targetId,
+    required this.lastMix,
+  });
+
+  factory CopyMixPlaylistResponse.fromJson(Json json) =>
+      _$CopyMixPlaylistResponseFromJson(json);
 }
 
 class _AuthClient extends http.BaseClient {
@@ -231,6 +267,62 @@ class _HttpMixologyApi implements MixologyApi {
     }
 
     final result = response.deserialize(MixPlaylistsResponse.fromJson);
+    return result.playlists;
+  }
+
+  @override
+  Future<void> addCopyMixPlaylist(String? playlistId) async {
+    final client = _client;
+    final url = _baseUri.resolve('/copyMix').replace(
+      queryParameters: {if (playlistId != null) 'playlistId': playlistId},
+    );
+
+    final http.Response response;
+    try {
+      response = await client.put(url);
+    } on http.ClientException catch (e) {
+      throw IoException(e);
+    }
+
+    if (response.statusCode != 204) {
+      throw ResponseStatusException(response.statusCode);
+    }
+  }
+
+  @override
+  Future<void> deleteCopyMixPlaylist(String targetId) async {
+    final client = _client;
+    final url = _baseUri.resolve('/copyMix/$targetId');
+
+    final http.Response response;
+    try {
+      response = await client.delete(url);
+    } on http.ClientException catch (e) {
+      throw IoException(e);
+    }
+
+    if (response.statusCode != 204) {
+      throw ResponseStatusException(response.statusCode);
+    }
+  }
+
+  @override
+  Future<List<CopyMixPlaylistResponse>> getCopyMixPlaylists() async {
+    final client = _client;
+    final url = _baseUri.resolve('/copyMix');
+
+    final http.Response response;
+    try {
+      response = await client.get(url);
+    } on http.ClientException catch (e) {
+      throw IoException(e);
+    }
+
+    if (response.statusCode != 200) {
+      throw ResponseStatusException(response.statusCode);
+    }
+
+    final result = response.deserialize(CopyMixPlaylistsResponse.fromJson);
     return result.playlists;
   }
 

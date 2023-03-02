@@ -53,7 +53,9 @@ class _AccountPageBodyState extends State<_AccountPageBody> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<MixologyBloc>(context).add(GetAccount());
+    final bloc = BlocProvider.of<MixologyBloc>(context);
+    bloc.add(GetAccount());
+    bloc.add(GetCopyMixPlaylists());
   }
 
   @override
@@ -71,7 +73,7 @@ class AccountInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Container(
-        height: 200,
+        height: 220,
         width: 400,
         padding: const EdgeInsets.only(
           top: 20,
@@ -82,6 +84,12 @@ class AccountInfoCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Expanded(child: _AccountInfo()),
+            const SizedBox(height: 20),
+            const Align(
+              alignment: Alignment.center,
+              child: _MixSavedTracksButton(),
+            ),
+            const SizedBox(height: 20),
             const Divider(height: 0),
             ButtonBar(
               mainAxisSize: MainAxisSize.max,
@@ -198,6 +206,62 @@ class _DeleteAccountButton extends StatelessWidget {
         }
       },
       child: const Text('Delete Account'),
+    );
+  }
+}
+
+class _MixSavedTracksButton extends StatelessWidget {
+  const _MixSavedTracksButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: const [
+        _MixSavedTracksStatus(),
+        Text('Mix saved tracks'),
+      ],
+    );
+  }
+}
+
+class _MixSavedTracksStatus extends StatelessWidget {
+  const _MixSavedTracksStatus();
+
+  @override
+  Widget build(BuildContext context) {
+    return LoadingAction<MixologyBloc, MixologyState,
+        List<CopyMixPlaylistResponse>>(
+      builder: (context, value) {
+        CopyMixPlaylistResponse? savedTracksMix;
+
+        if (value != null) {
+          for (final response in value) {
+            if (response.sourceId == null) {
+              savedTracksMix = response;
+              break;
+            }
+          }
+        }
+
+        return Checkbox(
+          tristate: value == null,
+          value: value == null ? null : savedTracksMix != null,
+          onChanged: (newValue) {
+            if (newValue == null) {
+              return;
+            }
+
+            final bloc = BlocProvider.of<MixologyBloc>(context);
+            if (newValue) {
+              bloc.add(const AddCopyMixPlaylist(null));
+            } else {
+              bloc.add(DeleteMixPlaylist(savedTracksMix!.targetId));
+            }
+          },
+        );
+      },
+      getLoadable: (s) => s.copyMixPlaylists,
     );
   }
 }
