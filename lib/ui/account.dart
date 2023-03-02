@@ -256,7 +256,7 @@ class _MixSavedTracksStatus extends StatelessWidget {
             if (newValue) {
               bloc.add(const AddCopyMixPlaylist(null));
             } else {
-              bloc.add(DeleteMixPlaylist(savedTracksMix!.targetId));
+              bloc.add(DeleteCopyMixPlaylist(savedTracksMix!.targetId));
             }
           },
         );
