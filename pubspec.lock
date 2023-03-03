@@ -689,10 +689,10 @@ packages:
     dependency: "direct main"
     description:
       name: spotify_api
-      sha256: f6f533881863784d48de6a42bc41e4e6c9d45435aee33990237e9c4c561857e2
+      sha256: b24b7d844834defc7e9e99877012ef973b00da7d4a958fcd622ecc8f152be9ae
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.1-alpha"
+    version: "0.4.0-alpha"
   stack_trace:
     dependency: transitive
     description:

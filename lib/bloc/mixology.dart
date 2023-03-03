@@ -423,12 +423,6 @@ class _MixologyAccessTokenRefresher implements AccessTokenRefresher {
   _MixologyAccessTokenRefresher(this._api);
 
   @override
-  String get clientId {
-    // Not actually used in this implementation
-    throw UnimplementedError();
-  }
-
-  @override
   Future<TokenInfo> retrieveToken(RequestsClient client) async {
     return await _api.getSpotifyAccessToken();
   }
