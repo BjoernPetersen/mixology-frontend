@@ -68,6 +68,8 @@ jobs:
     needs: build
     if: ${{ success() && github.ref != 'refs/heads/main' }}
     steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
       - name: Pull Artifacts
         uses: actions/download-artifact@v3
         with:
@@ -83,6 +85,8 @@ jobs:
     needs: build
     if: ${{ success() && github.ref == 'refs/heads/main' }}
     steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
       - name: Pull Artifacts
         uses: actions/download-artifact@v3
         with:
