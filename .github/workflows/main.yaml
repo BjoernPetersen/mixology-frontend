@@ -78,6 +78,7 @@ jobs:
       - name: Build container image
         uses: docker/build-push-action@v4
         with:
+          context: .
           tags: ghcr.io/bjoernpetersen/mixology-frontend:${{ github.sha }}
 
   push-image:
@@ -101,6 +102,7 @@ jobs:
       - name: Build container image
         uses: docker/build-push-action@v4
         with:
+          context: .
           push: true
           tags: ghcr.io/bjoernpetersen/mixology-frontend:${{ github.sha }}
 
