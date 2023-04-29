@@ -76,11 +76,13 @@ RouterConfig<Object> _createRouter() {
       ),
       GoRoute(
         path: '/auth/callback',
-        builder: (context, state) => AuthCallbackPage(
-          state: state.queryParams['state'],
-          error: state.queryParams['error']?.nullIfEmpty(),
-          code: state.queryParams['code']?.nullIfEmpty(),
-        ),
+        builder: (context, state) {
+          return AuthCallbackPage(
+          state: state.queryParameters['state'],
+          error: state.queryParameters['error']?.nullIfEmpty(),
+          code: state.queryParameters['code']?.nullIfEmpty(),
+        );
+        },
       ),
     ],
   );
