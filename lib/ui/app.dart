@@ -78,10 +78,10 @@ RouterConfig<Object> _createRouter() {
         path: '/auth/callback',
         builder: (context, state) {
           return AuthCallbackPage(
-          state: state.queryParameters['state'],
-          error: state.queryParameters['error']?.nullIfEmpty(),
-          code: state.queryParameters['code']?.nullIfEmpty(),
-        );
+            state: state.queryParameters['state'],
+            error: state.queryParameters['error']?.nullIfEmpty(),
+            code: state.queryParameters['code']?.nullIfEmpty(),
+          );
         },
       ),
     ],
