@@ -19,7 +19,7 @@ dependencies:
   flutter_web_plugins:
     sdk: flutter
   go_router: ^7.0.0
-  http: ^0.13.5
+  http: ^1.0.0
   json_annotation: ^4.8.0
   meta: ^1.8.0
   mutex: ^3.0.1
