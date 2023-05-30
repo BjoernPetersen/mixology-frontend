@@ -139,11 +139,11 @@ class _AccountInfo extends StatelessWidget {
         }
 
         if (loadable is LoadingError<AccountInfoResponse>) {
-          return Opacity(
+          return const Opacity(
             opacity: 0.8,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
+              children: [
                 Icon(Icons.error),
                 SizedBox(height: 10),
                 Text('This content could not be loaded.'),
@@ -215,9 +215,9 @@ class _MixSavedTracksButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return const Row(
       mainAxisSize: MainAxisSize.min,
-      children: const [
+      children: [
         _MixSavedTracksStatus(),
         Text('Mix saved tracks'),
       ],
