@@ -25,7 +25,7 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
       - name: Run code generation
-        run: dart build_runner build
+        run: dart run build_runner build
       - name: Run Analysis
         run: flutter analyze --fatal-infos
 
