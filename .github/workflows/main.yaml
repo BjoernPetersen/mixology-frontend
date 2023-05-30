@@ -11,11 +11,7 @@ jobs:
     steps:
       - name: Check out repo
         uses: actions/checkout@v3
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.7.x'
-          channel: 'stable'
+      - uses: asdf-vm/actions/install@v2
       - name: Check lib formatting
         run: dart format lib --set-exit-if-changed --output=none
 
@@ -25,11 +21,7 @@ jobs:
     steps:
       - name: Check out repo
         uses: actions/checkout@v3
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.7.x'
-          channel: 'stable'
+      - uses: asdf-vm/actions/install@v2
       - name: Get dependencies
         run: flutter pub get
       - name: Run code generation
@@ -46,11 +38,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           lfs: true
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.7.x'
-          channel: 'stable'
+      - uses: asdf-vm/actions/install@v2
       - name: Get dependencies
         run: flutter pub get
       - name: Run code generation
