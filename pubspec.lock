@@ -197,10 +197,10 @@ packages:
     dependency: "direct main"
     description:
       name: dart_jsonwebtoken
-      sha256: f565a76800b01d3216296a049bc8f189695ab2433afa36cad0e086e46b48d70d
+      sha256: e878f2ee660aba6536d23aca710a475b2dd1ccf61130e2341fbb07cc98442f4a
       url: "https://pub.dev"
     source: hosted
-    version: "2.8.0"
+    version: "2.8.2"
   dart_style:
     dependency: transitive
     description:
@@ -849,10 +849,10 @@ packages:
     dependency: transitive
     description:
       name: vm_service
-      sha256: f3743ca475e0c9ef71df4ba15eb2d7684eecd5c8ba20a462462e4e8b561b2e11
+      sha256: c620a6f783fa22436da68e42db7ebbf18b8c44b9a46ab911f666ff09ffd9153f
       url: "https://pub.dev"
     source: hosted
-    version: "11.6.0"
+    version: "11.7.1"
   watcher:
     dependency: transitive
     description:
