@@ -23,8 +23,8 @@ class MixologyApp extends StatelessWidget {
     required this.initialRefreshToken,
   }) : _router = _createRouter();
 
-  static void run(
-    Uri apiBaseUrl, {
+  static void run({
+    required Uri apiBaseUrl,
     String? refreshToken,
   }) {
     Bloc.transformer = sequential();

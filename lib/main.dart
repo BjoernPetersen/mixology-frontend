@@ -4,7 +4,7 @@ const refreshToken = null;
 
 void main() {
   MixologyApp.run(
-    Uri.https('api.mix.bembel.party'),
+    apiBaseUrl: Uri.https('mix-api.bembel.party'),
     refreshToken: refreshToken,
   );
 }
