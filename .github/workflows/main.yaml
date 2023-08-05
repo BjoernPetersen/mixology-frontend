@@ -54,7 +54,7 @@ jobs:
   build-container-image:
     name: Build Container Package
     runs-on: ubuntu-latest
-    needs: build
+    needs: build-web-package
     if: success() && github.event_name == 'pull_request'
     steps:
       - name: Inject slug/short variables
@@ -76,7 +76,7 @@ jobs:
   push-container-image:
     name: Build & Push Container Package
     runs-on: ubuntu-latest
-    needs: build
+    needs: build-web-package
     if: success() && github.ref_name == github.event.repository.default_branch
     steps:
       - name: Inject slug/short variables
