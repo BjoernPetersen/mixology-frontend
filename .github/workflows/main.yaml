@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - uses: asdf-vm/actions/install@v2
       - name: Check lib formatting
         run: dart format lib --set-exit-if-changed --output=none
@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - uses: asdf-vm/actions/install@v2
       - name: Get dependencies
         run: flutter pub get
@@ -35,7 +35,7 @@ jobs:
     needs: [check-format, lint]
     steps:
       - name: Check out repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           lfs: true
       - uses: asdf-vm/actions/install@v2
@@ -60,7 +60,7 @@ jobs:
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4
       - name: Check out repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Pull Artifacts
         uses: actions/download-artifact@v3
         with:
@@ -82,7 +82,7 @@ jobs:
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4
       - name: Check out repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Pull Artifacts
         uses: actions/download-artifact@v3
         with:
@@ -107,7 +107,7 @@ jobs:
       - push-container-image
     concurrency: production
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4
       - name: Substitute environment variables in values.yaml
