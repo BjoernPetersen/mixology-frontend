@@ -34,14 +34,14 @@ abstract class LoadingError<T> implements Loadable<T> {
 
 @immutable
 class _InitialError<T> extends LoadingError<T> {
-  const _InitialError(String error) : super._(error);
+  const _InitialError(super.error) : super._();
 }
 
 @immutable
 class _RefreshError<T> extends LoadingError<T> implements Loaded<T> {
   final Loaded<T> _previous;
 
-  const _RefreshError(String error, this._previous) : super._(error);
+  const _RefreshError(super.error, this._previous) : super._();
 
   @override
   DateTime get loadedAt => _previous.loadedAt;
