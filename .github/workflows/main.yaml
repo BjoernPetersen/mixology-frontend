@@ -46,7 +46,7 @@ jobs:
       - name: Build web package
         run: flutter build web
       - name: Store build result
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: web-app
           path: build/web
