@@ -380,10 +380,10 @@ packages:
     dependency: transitive
     description:
       name: logger
-      sha256: "7ad7215c15420a102ec687bb320a7312afd449bac63bfb1c60d9787c27b9767f"
+      sha256: "6bbb9d6f7056729537a4309bda2e74e18e5d9f14302489cc1e93f33b3fe32cac"
       url: "https://pub.dev"
     source: hosted
-    version: "1.4.0"
+    version: "2.0.2+1"
   logging:
     dependency: transitive
     description:
@@ -681,10 +681,10 @@ packages:
     dependency: "direct main"
     description:
       name: spotify_api
-      sha256: "983e83aff66c30e0dd83c2293fd564af51b1b44cc8b4f770829ff569736666e7"
+      sha256: "499d0729cb7704b793d77a79c6a92b9f33da388c5e1b52624d409cc0d142ca61"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.1-alpha"
+    version: "1.0.0"
   stack_trace:
     dependency: transitive
     description:
