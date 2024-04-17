@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: frontend
 spec:
-  replicas: 3
+  replicas: 1
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: {{ .Values.image }}
+          image: {{ .Values.image }}:{{ .Values.appVersion }}
           ports:
             - containerPort: 8080
               name: http
