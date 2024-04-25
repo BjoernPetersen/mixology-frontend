@@ -1,4 +1,4 @@
-FROM nginxinc/nginx-unprivileged:1.25
+FROM nginxinc/nginx-unprivileged:1.26
 
 COPY build/web /usr/share/nginx/html/
 
