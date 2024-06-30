@@ -1,0 +1,7 @@
+**/*
+!assets/
+!lib/
+!web/
+!.metadata
+!nginx.conf
+!pubspec.*
