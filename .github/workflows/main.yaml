@@ -30,36 +30,13 @@ jobs:
         run: flutter analyze --fatal-infos
 
   build-container-image:
-    runs-on: ubuntu-latest
     needs:
       - check-format
       - lint
-    steps:
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: linux/arm64
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          platforms: linux/arm64
-      - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v4
-      - name: Check out repo
-        uses: actions/checkout@v4
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ github.token }}
-      - name: Build container image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          platforms: linux/arm64
-          push: ${{ github.ref_name == github.event.repository.default_branch }}
-          tags: "ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ github.sha }}"
+    uses: BjoernPetersen/actions-container/.github/workflows/build-image-docker.yml@v3
+    with:
+      platform: 'linux/arm64'
+      push-image: ${{ github.ref_name == github.event.repository.default_branch }}
 
   deploy:
     runs-on: ubuntu-latest
