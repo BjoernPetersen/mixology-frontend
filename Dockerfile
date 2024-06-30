@@ -1,12 +1,10 @@
-FROM ghcr.io/cirruslabs/flutter:3.22.2 AS builder
+FROM ghcr.io/blindfoldedsurgery/flutter:1.1.0-3.22 AS builder
 
-WORKDIR /repo
+COPY --chown=app [ "pubspec.yaml", "pubspec.lock", "./" ]
 
-COPY [ "pubspec.yaml", "pubspec.lock", "./" ]
+RUN flutter pub get --enforce-lockfile
 
-RUN flutter pub get
-
-COPY . .
+COPY --chown=app . .
 
 RUN dart run build_runner build
 
@@ -14,7 +12,7 @@ RUN flutter build web
 
 FROM nginxinc/nginx-unprivileged:1.27
 
-COPY --from=builder --chown=nginx /repo/build/web /usr/share/nginx/html/
+COPY --from=builder --chown=nginx /app/build/web /usr/share/nginx/html/
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
