@@ -91,8 +91,8 @@ class AccountInfoCard extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             const Divider(height: 0),
-            ButtonBar(
-              mainAxisSize: MainAxisSize.max,
+            OverflowBar(
+              overflowAlignment: OverflowBarAlignment.end,
               children: [
                 LoadingAction<MixologyBloc, MixologyState, void>(
                   getLoadable: (state) => state.accountDeletion,
