@@ -94,7 +94,7 @@ class _PlaylistsPagerState extends State<_PlaylistsPager> {
           if (state.playlists is Loading<PlaylistPage> &&
               state.playlists is Loaded<PlaylistPage>)
             const LinearProgressIndicator(),
-          const ButtonBar(
+          const OverflowBar(
             children: [
               _PreviousPageButton(),
               _NextPageButton(),
