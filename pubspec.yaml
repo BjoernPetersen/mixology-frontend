@@ -8,6 +8,7 @@ version: 1.0.0+1
 
 environment:
   sdk: ^3.0.0
+  flutter: ^3.24.0
 
 dependencies:
   bloc: ^8.1.1
