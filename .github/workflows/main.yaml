@@ -33,7 +33,7 @@ jobs:
     needs:
       - check-format
       - lint
-    uses: BjoernPetersen/actions-container/.github/workflows/build-image-kaniko.yml@v3
+    uses: BjoernPetersen/actions-container/.github/workflows/build-image-kaniko.yml@v4
     with:
       runner-name-build: ubicloud-standard-2-arm
       push-image: ${{ github.ref_name == github.event.repository.default_branch }}
@@ -52,4 +52,4 @@ jobs:
   clean:
     concurrency: cleanup
     needs: [ deploy ]
-    uses: BjoernPetersen/actions-container/.github/workflows/clean.yml@v3
+    uses: BjoernPetersen/actions-container/.github/workflows/clean.yml@v4
