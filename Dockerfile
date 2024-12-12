@@ -1,4 +1,4 @@
-FROM ghcr.io/blindfoldedsurgery/flutter:1.2.1-3.24 AS builder
+FROM ghcr.io/blindfoldedsurgery/flutter:2.1.0-3.24 AS builder
 
 COPY --chown=app [ "pubspec.yaml", "pubspec.lock", "./" ]
 
